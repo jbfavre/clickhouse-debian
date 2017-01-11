@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 9), cmake, gcc-6, g++-6, libboost-dev, libicu-dev,
                libreadline-dev, default-libmysqlclient-dev | libmysqlclient-dev,
                unixodbc-dev, libboost-thread-dev, libboost-program-options-dev,
                libboost-system-dev, libboost-regex-dev, libboost-filesystem-dev,
-               libglib2.0-dev, libltdl-dev, libssl-dev
+               libglib2.0-dev, libltdl-dev, libssl-dev, clang
 Standards-Version: 3.9.8
 Homepage: https://clickhouse.yandex/
 #Vcs-Git: https://anonscm.debian.org/collab-maint/clickhouse.git
