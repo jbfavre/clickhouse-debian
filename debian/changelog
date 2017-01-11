@@ -1,0 +1,5 @@
+clickhouse (1.1.54127-1) unstable; urgency=medium
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Jean Baptiste Favre <debian@jbfavre.org>  Wed, 11 Jan 2017 11:46:05 +0100

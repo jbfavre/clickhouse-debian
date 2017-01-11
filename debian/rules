@@ -1,0 +1,155 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+export USE_STATIC_LIBRARIES=0
+ifndef THREADS_COUNT
+    THREADS_COUNT=`grep -c ^processor /proc/cpuinfo`
+endif
+
+DAEMONS=compressor clickhouse-client clickhouse-server config-processor
+
+BUILD_TARGETS=clickhouse $(DAEMONS)
+
+configure-stamp:
+	dh_testdir
+	rm -rf build
+	make clean 1> /dev/null 2>&1 || echo "Nothing to clean"
+	rm -f CMakeCache.txt
+	mkdir -p build
+	touch configure-stamp
+
+build: build-arch build-indep
+build-arch: build-stamp
+build-indep: build-stamp
+build-stamp: configure-stamp
+	dh_testdir
+	# если не задан тип сборки запускаем cmake без указания типа, если задан - передаём его
+	# для сборки в Debug нужно запустить так: debuild -e CMAKE_BUILD_TYPE=Debug
+	cd build && pwd && if [ -z CMAKE_BUILD_TYPE ]; then cmake ..; else cmake -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) ..; fi
+	# TODO: возможно надо исправить
+	# последовательно запускаем make для каждой из целей.
+	# т.к. при параллельном запуске (make target1 target2) несколько раз одновременно создаются бинарники
+	# и возникает raise с custom_command, использующие эти бинарники
+	for target in ${BUILD_TARGETS}; \
+	do \
+		$(MAKE) -j$(THREADS_COUNT) -C build $$target; \
+	done
+	touch $@
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f configure-stamp build-stamp
+	rm -rf build
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep
+	cd build && \
+	for target in ${BUILD_TARGETS}; \
+	do \
+		DESTDIR=../debian/tmp cmake -DCOMPONENT=$$target -P cmake_install.cmake; \
+	done
+
+	#for I in debian/tmp/etc/init.d/*;
+	#do
+	#	echo $$I;
+	#	ln -s tmp/etc/init.d/`basename $$I` debian/`basename $$I`.init;
+	#done
+	#if [ -e debian/tmp/etc/init.d/clickhouse-server ];
+	#then
+	#	ln -s tmp/etc/init.d/clickhouse-server debian/clickhouse-server-base.clickhouse-server.init;
+	#fi
+	#for I in debian/tmp/etc/init.d/*; \
+	#do \
+	#	cron_name=`basename $$I`; \
+	#	if [ ! -d debian/tmp/etc/cron.d ]; then \
+	#		mkdir -p debian/tmp/etc/cron.d; \
+	#	fi; \
+	#	if [ ! -f debian/tmp/etc/cron.d/$$cron_name ]; then \
+	#		echo "#*/10 * * * * root /etc/init.d/$$cron_name condstart 1>/dev/null 2>&1" > debian/tmp/etc/cron.d/$$cron_name; \
+	#	fi; \
+	#done; \
+
+	#for DAEMON_PKG in ${DAEMONS}; do \
+	#	if [ ! -e "debian/$$DAEMON_PKG-metrika-yandex.install" ]; then \
+	#		echo "# automatically created" > debian/$$DAEMON_PKG-metrika-yandex.install; \
+	#		echo "/etc/$$DAEMON_PKG/config.xml" >> debian/$$DAEMON_PKG-metrika-yandex.install; \
+	#		echo "/usr/bin/$$DAEMON_PKG" >> debian/$$DAEMON_PKG-metrika-yandex.install; \
+	#		echo "/etc/cron.d/$$DAEMON_PKG-metrika-yandex" >> debian/$$DAEMON_PKG-metrika-yandex.install; \
+	#		if [ -e "debian/tmp/etc/monrun/conf.d/$$DAEMON_PKG.conf" ]; then \
+	#			echo "/etc/monrun/conf.d/$$DAEMON_PKG.conf" >> debian/$$DAEMON_PKG-metrika-yandex.install; \
+	#		fi;\
+	#	fi;  \
+	#done
+
+	#for DAEMON_PKG in ${DAEMONS}; do \
+	#	if [ ! -e "debian/$$DAEMON_PKG-metrika-yandex.postinst" ]; then \
+	#		echo "# automatically created" > debian/$$DAEMON_PKG-metrika-yandex.postinst; \
+	#		echo "mkdir -p /etc/$$DAEMON_PKG/conf.d" >> debian/$$DAEMON_PKG-metrika-yandex.postinst; \
+	#		echo "chown -R metrika: /etc/$$DAEMON_PKG" >> debian/$$DAEMON_PKG-metrika-yandex.postinst; \
+	#		if [ -e "debian/tmp/etc/init.d/$$DAEMON_PKG-metrika-yandex" ]; then \
+	#			if echo $$DAEMON_PKG | grep server > /dev/null; then\
+	#				echo "update-rc.d $$DAEMON_PKG-metrika-yandex defaults > /dev/null || exit \$$?" >> debian/$$DAEMON_PKG-metrika-yandex.postinst; \
+	#			else\
+	#				echo "update-rc.d $$DAEMON_PKG-metrika-yandex start 30 2 3 4 5 . stop 70 0 1 6 . > /dev/null || exit \$$?" >> debian/$$DAEMON_PKG-metrika-yandex.postinst; \
+	#			fi\
+	#		fi\
+	#		\
+	#	else \
+	#		echo >> debian/$$DAEMON_PKG-metrika-yandex.postinst; \
+	#		echo "mkdir -p /etc/$$DAEMON_PKG/conf.d; chown -R metrika: /etc/$$DAEMON_PKG" >> debian/$$DAEMON_PKG-metrika-yandex.postinst; \
+	#	fi;  \
+	#done
+
+
+	# В случае сборки clickhouse-server, добавим в пакет бинарник clang-а, ld и заголовочные файлы - для динамической компиляции.
+	#if [ -e debian/tmp/etc/init.d/clickhouse-server ]; then \
+	#	mkdir -p debian/tmp/usr/share/clickhouse/bin debian/tmp/usr/share/clickhouse/headers; \
+	#	debian/copy_clang_binaries.sh debian/tmp/usr/share/clickhouse/bin/; \
+	#	./copy_headers.sh . debian/tmp/usr/share/clickhouse/headers; \
+	#fi;
+
+	# Создаём документацию
+	#cp LICENSE debian/copyright
+
+	#for DAEMON_PKG in ${DAEMONS}; do \
+	#	echo "LICENSE" > debian/$$DAEMON_PKG.docs; \
+	#	echo "AUTHORS" >> debian/$$DAEMON_PKG.docs; \
+	#	echo "README.md" >> debian/$$DAEMON_PKG.docs; \
+	#done
+
+	#ln -s clickhouse-server.docs debian/clickhouse-server-base.docs
+	#ln -s clickhouse-server.docs debian/clickhouse-server-common.docs
+	#ln -s clickhouse-server.docs debian/clickhouse-server-metrika.docs
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installdocs
+	dh_installinit --no-start --no-package=clickhouse-server-base
+	dh_installinit --no-start --package=clickhouse-server-base --name=clickhouse-server
+	dh_installcron
+	dh_installdirs
+	dh_installchangelogs
+	dh_install --sourcedir=debian/tmp
+	dh_link
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps --exclude=clang --exclude=stdc --exclude=ld
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb -- -Zgzip -z3
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install

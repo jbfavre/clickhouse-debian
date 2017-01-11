@@ -1,0 +1,37 @@
+--- a/.gitignore
++++ b/.gitignore
+@@ -156,20 +156,10 @@ utils/zookeeper-dump-tree/zookeeper-dump
+ utils/zookeeper-remove-by-list/zookeeper-remove-by-list
+ dbms/src/Storages/tests/remove_symlink_directory
+ dbms/tests/queries/1_stateful
+-debian/control
+-debian/copyright
+-debian/tmp/
+ libs/libcommon/src/tests/json_test
+ utils/compressor/zstd_test
+ utils/wikistat-loader/wikistat-loader
+ dbms/src/Common/tests/pod_array
+-debian/clickhouse-benchmark/
+-debian/clickhouse-client/
+-debian/clickhouse-server-base/
+-debian/clickhouse-server-common/
+-debian/clickhouse-server-metrika/
+-debian/files
+-
+ dbms/src/Server/data/*
+ dbms/src/Server/metadata/*
+ dbms/src/Server/status
+@@ -187,13 +177,6 @@ vgcore*
+ *.changes
+ build-stamp
+ configure-stamp
+-debian/changelog
+-debian/*.debhelper.log
+-debian/*.cron.d
+-debian/*.init
+-debian/*.debhelper
+-debian/*.substvars
+-
+ *.bin
+ *.mrk
+ 

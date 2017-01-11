@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+mkdir -p /etc/clickhouse-benchmark/conf.d
+chown -R metrika: /etc/clickhouse-benchmark
+
+#DEBHELPER#

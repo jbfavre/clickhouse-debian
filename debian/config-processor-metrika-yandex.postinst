@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+mkdir -p /etc/config-processor/conf.d
+chown -R metrika: /etc/config-processor
+
+#DEBHELPER#
