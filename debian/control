@@ -47,7 +47,7 @@ Description: clickhouse-benchmark
  ClickHouse is an open-source column-oriented database management system
  that allows generating analytical data reports in real time.
 
-Package: config-processor-metrika-yandex
+Package: clickhouse-config-processor
 Section: database
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
@@ -56,7 +56,7 @@ Description: config-processor-metrika-yandex
 
 
 
-Package: compressor-metrika-yandex
+Package: clickhouse-compressor
 Section: database
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
