@@ -55,77 +55,24 @@ install: build
 		DESTDIR=../debian/tmp cmake -DCOMPONENT=$$target -P cmake_install.cmake; \
 	done
 
-	#for I in debian/tmp/etc/init.d/*;
-	#do
-	#	echo $$I;
-	#	ln -s tmp/etc/init.d/`basename $$I` debian/`basename $$I`.init;
-	#done
-	#if [ -e debian/tmp/etc/init.d/clickhouse-server ];
-	#then
-	#	ln -s tmp/etc/init.d/clickhouse-server debian/clickhouse-server-base.clickhouse-server.init;
-	#fi
-	#for I in debian/tmp/etc/init.d/*; \
-	#do \
-	#	cron_name=`basename $$I`; \
-	#	if [ ! -d debian/tmp/etc/cron.d ]; then \
-	#		mkdir -p debian/tmp/etc/cron.d; \
-	#	fi; \
-	#	if [ ! -f debian/tmp/etc/cron.d/$$cron_name ]; then \
-	#		echo "#*/10 * * * * root /etc/init.d/$$cron_name condstart 1>/dev/null 2>&1" > debian/tmp/etc/cron.d/$$cron_name; \
-	#	fi; \
-	#done; \
-
-	#for DAEMON_PKG in ${DAEMONS}; do \
-	#	if [ ! -e "debian/$$DAEMON_PKG-metrika-yandex.install" ]; then \
-	#		echo "# automatically created" > debian/$$DAEMON_PKG-metrika-yandex.install; \
-	#		echo "/etc/$$DAEMON_PKG/config.xml" >> debian/$$DAEMON_PKG-metrika-yandex.install; \
-	#		echo "/usr/bin/$$DAEMON_PKG" >> debian/$$DAEMON_PKG-metrika-yandex.install; \
-	#		echo "/etc/cron.d/$$DAEMON_PKG-metrika-yandex" >> debian/$$DAEMON_PKG-metrika-yandex.install; \
-	#		if [ -e "debian/tmp/etc/monrun/conf.d/$$DAEMON_PKG.conf" ]; then \
-	#			echo "/etc/monrun/conf.d/$$DAEMON_PKG.conf" >> debian/$$DAEMON_PKG-metrika-yandex.install; \
-	#		fi;\
-	#	fi;  \
-	#done
-
-	#for DAEMON_PKG in ${DAEMONS}; do \
-	#	if [ ! -e "debian/$$DAEMON_PKG-metrika-yandex.postinst" ]; then \
-	#		echo "# automatically created" > debian/$$DAEMON_PKG-metrika-yandex.postinst; \
-	#		echo "mkdir -p /etc/$$DAEMON_PKG/conf.d" >> debian/$$DAEMON_PKG-metrika-yandex.postinst; \
-	#		echo "chown -R metrika: /etc/$$DAEMON_PKG" >> debian/$$DAEMON_PKG-metrika-yandex.postinst; \
-	#		if [ -e "debian/tmp/etc/init.d/$$DAEMON_PKG-metrika-yandex" ]; then \
-	#			if echo $$DAEMON_PKG | grep server > /dev/null; then\
-	#				echo "update-rc.d $$DAEMON_PKG-metrika-yandex defaults > /dev/null || exit \$$?" >> debian/$$DAEMON_PKG-metrika-yandex.postinst; \
-	#			else\
-	#				echo "update-rc.d $$DAEMON_PKG-metrika-yandex start 30 2 3 4 5 . stop 70 0 1 6 . > /dev/null || exit \$$?" >> debian/$$DAEMON_PKG-metrika-yandex.postinst; \
-	#			fi\
-	#		fi\
-	#		\
-	#	else \
-	#		echo >> debian/$$DAEMON_PKG-metrika-yandex.postinst; \
-	#		echo "mkdir -p /etc/$$DAEMON_PKG/conf.d; chown -R metrika: /etc/$$DAEMON_PKG" >> debian/$$DAEMON_PKG-metrika-yandex.postinst; \
-	#	fi;  \
-	#done
-
+	for DAEMON_PKG in ${DAEMONS}; do \
+		if [ ! -e "debian/$$DAEMON_PKG-metrika-yandex.install" ]; then \
+			echo "# automatically created" > debian/$$DAEMON_PKG-metrika-yandex.install; \
+			echo "/etc/$$DAEMON_PKG/config.xml" >> debian/$$DAEMON_PKG-metrika-yandex.install; \
+			echo "/usr/bin/$$DAEMON_PKG" >> debian/$$DAEMON_PKG-metrika-yandex.install; \
+			echo "/etc/cron.d/$$DAEMON_PKG-metrika-yandex" >> debian/$$DAEMON_PKG-metrika-yandex.install; \
+			if [ -e "debian/tmp/etc/monrun/conf.d/$$DAEMON_PKG.conf" ]; then \
+				echo "/etc/monrun/conf.d/$$DAEMON_PKG.conf" >> debian/$$DAEMON_PKG-metrika-yandex.install; \
+			fi;\
+		fi;  \
+	done
 
 	# В случае сборки clickhouse-server, добавим в пакет бинарник clang-а, ld и заголовочные файлы - для динамической компиляции.
-	#if [ -e debian/tmp/etc/init.d/clickhouse-server ]; then \
-	#	mkdir -p debian/tmp/usr/share/clickhouse/bin debian/tmp/usr/share/clickhouse/headers; \
-	#	debian/copy_clang_binaries.sh debian/tmp/usr/share/clickhouse/bin/; \
-	#	./copy_headers.sh . debian/tmp/usr/share/clickhouse/headers; \
-	#fi;
-
-	# Создаём документацию
-	#cp LICENSE debian/copyright
-
-	#for DAEMON_PKG in ${DAEMONS}; do \
-	#	echo "LICENSE" > debian/$$DAEMON_PKG.docs; \
-	#	echo "AUTHORS" >> debian/$$DAEMON_PKG.docs; \
-	#	echo "README.md" >> debian/$$DAEMON_PKG.docs; \
-	#done
-
-	#ln -s clickhouse-server.docs debian/clickhouse-server-base.docs
-	#ln -s clickhouse-server.docs debian/clickhouse-server-common.docs
-	#ln -s clickhouse-server.docs debian/clickhouse-server-metrika.docs
+	if [ -e debian/tmp/etc/init.d/clickhouse-server ]; then \
+		mkdir -p debian/tmp/usr/share/clickhouse/bin debian/tmp/usr/share/clickhouse/headers; \
+		debian/copy_clang_binaries.sh debian/tmp/usr/share/clickhouse/bin/; \
+		./copy_headers.sh . debian/tmp/usr/share/clickhouse/headers; \
+	fi;
 
 # Build architecture-independent files here.
 binary-indep: build install
