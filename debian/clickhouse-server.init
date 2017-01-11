@@ -1,11 +1,14 @@
 #!/bin/bash
 ### BEGIN INIT INFO
 # Provides:          clickhouse-server
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Required-Start:
-# Required-Stop:
-# Short-Description: Yandex daemon
+# Default-Start:	2 3 4 5
+# Default-Stop:		0 1 6
+# Required-Start:	$syslog, $remote_fs
+# Required-Stop:	$syslog, $remote_fs
+# Should-Start:         $local_fs
+# Should-Stop:          $local_fs
+# Short-Description:	clickhouse-server - Analytics db
+# Description:		clickhouse-server - Analytics db
 ### END INIT INFO
 
 USER=metrika
@@ -23,6 +26,8 @@ RETVAL=0
 
 DEFAULT_NUMBER_OF_PROCESSES=1
 NUMBER_OF_PROCESSES=$DEFAULT_NUMBER_OF_PROCESSES
+
+. /lib/lsb/init-functions
 
 LOG_FILE=""
 
@@ -260,6 +265,10 @@ main()
 		;;
 	reload)
 		restart
+		;;
+	force-reload)
+		disable_cron && stop
+		start && enable_cron
 		;;
 	condstart)
 		all_runs || start
