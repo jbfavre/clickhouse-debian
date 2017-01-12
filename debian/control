@@ -12,9 +12,20 @@ Homepage: https://clickhouse.yandex/
 #Vcs-Git: https://anonscm.debian.org/collab-maint/clickhouse.git
 #Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/clickhouse.git
 
+Package: clickhouse-common
+Section: database
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, lsb-base (>= 3.2-14), adduser
+Description: Common files for clickhouse
+ Yandex ClickHouse is an open-source column-oriented database management system
+ that allows generating analytical data reports in real time.
+ .
+ This package provides common files for clickhouse
+
 Package: clickhouse-server
 Section: database
 Architecture: any
+Pre-Depends: clickhouse-common (= ${binary:Version})
 Depends: ${shlibs:Depends}, ${misc:Depends}, lsb-base (>= 3.2-14), adduser
 Description: Base package for clickhouse
  Yandex ClickHouse is an open-source column-oriented database management system
@@ -22,20 +33,10 @@ Description: Base package for clickhouse
  .
  This package provides clickhouse common configuration files
 
-Package: clickhouse-server-common
-Section: database
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, lsb-base (>= 3.2-14), adduser,
-         clickhouse-server (= ${binary:Version})
-Description: Common files for clickhouse
- Yandex ClickHouse is an open-source column-oriented database management system
- that allows generating analytical data reports in real time.
- .
- This package provides common configuration files for clickhouse
-
 Package: clickhouse-client
 Section: database
 Architecture: any
+Pre-Depends: clickhouse-common (= ${binary:Version})
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Client binary for clickhouse
  Yandex ClickHouse is an open-source column-oriented database management system
