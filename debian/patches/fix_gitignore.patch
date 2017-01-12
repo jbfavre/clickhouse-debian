@@ -1,6 +1,14 @@
 --- a/.gitignore
 +++ b/.gitignore
-@@ -156,20 +156,10 @@ utils/zookeeper-dump-tree/zookeeper-dump
+@@ -1,6 +1,7 @@
+ # emacs files
+ *~
+ *\#
++!debian/**
+ 
+ # auto generated files
+ *.logrt
+@@ -156,20 +157,10 @@ utils/zookeeper-dump-tree/zookeeper-dump
  utils/zookeeper-remove-by-list/zookeeper-remove-by-list
  dbms/src/Storages/tests/remove_symlink_directory
  dbms/tests/queries/1_stateful
@@ -21,7 +29,7 @@
  dbms/src/Server/data/*
  dbms/src/Server/metadata/*
  dbms/src/Server/status
-@@ -187,13 +177,6 @@ vgcore*
+@@ -187,13 +178,6 @@ vgcore*
  *.changes
  build-stamp
  configure-stamp
