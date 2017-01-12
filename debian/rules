@@ -71,8 +71,7 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installdocs
-	dh_installinit --no-start --no-package=clickhouse-server-base
-	dh_installinit --no-start --package=clickhouse-server-base --name=clickhouse-server
+	dh_installinit --no-start --package=clickhouse-server --name=clickhouse-server
 	dh_installcron
 	dh_installdirs
 	dh_installchangelogs
