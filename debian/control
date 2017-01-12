@@ -16,16 +16,21 @@ Package: clickhouse-server-base
 Section: database
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, lsb-base (>= 3.2-14), adduser
-Description: clickhouse-server-base
- ClickHouse is an open-source column-oriented database management system
+Description: Base package for clickhouse
+ Yandex ClickHouse is an open-source column-oriented database management system
  that allows generating analytical data reports in real time.
+ .
+ This package provides clickhouse server binaries
 
 Package: clickhouse-server-common
 Section: database
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, clickhouse-server-base (= ${binary:Version})
-Description: clickhouse-server-common
- Common configuration files for clickhouse-server-base package
+Description: Common files for clickhouse
+ Yandex ClickHouse is an open-source column-oriented database management system
+ that allows generating analytical data reports in real time.
+ .
+ This package provides common configuration files for clickhouse
 
 
 
@@ -33,35 +38,38 @@ Package: clickhouse-client
 Section: database
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: clickhouse-client
-
-
-
-
+Description: Client binary for clickhouse
+ Yandex ClickHouse is an open-source column-oriented database management system
+ that allows generating analytical data reports in real time.
+ .
+ This package provides clickhouse client binary
 
 Package: clickhouse-benchmark
 Section: database
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: clickhouse-benchmark
- ClickHouse is an open-source column-oriented database management system
+Description: Benchmark utility for clickhouse
+ Yandex ClickHouse is an open-source column-oriented database management system
  that allows generating analytical data reports in real time.
+ .
+ This package provides clickhouse benchmark utility
 
 Package: clickhouse-config-processor
 Section: database
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: config-processor-metrika-yandex
-
-
-
+Description: Config processor for clickhouse
+ Yandex ClickHouse is an open-source column-oriented database management system
+ that allows generating analytical data reports in real time.
+ .
+ This package provides config processor binary
 
 Package: clickhouse-compressor
 Section: database
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: compressor-metrika-yandex
-
-
-
-
+Description: Compressor utility for clickhouse
+ Yandex ClickHouse is an open-source column-oriented database management system
+ that allows generating analytical data reports in real time.
+ .
+ This package provides compressor binary
