@@ -1,8 +1,0 @@
-#!/bin/sh
-
-set -e
-
-mkdir -p /etc/compressor/conf.d
-chown -R metrika: /etc/compressor
-
-#DEBHELPER#
