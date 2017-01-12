@@ -53,6 +53,7 @@ Description: Various utilities for clickhouse analytics db
  that allows generating analytical data reports in real time.
  .
  This package provides:
- - benchmark utility
- - configuration processor
- - compressor
+ .
+   - benchmark utility
+   - configuration processor
+   - compressor
