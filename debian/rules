@@ -27,7 +27,7 @@ build-stamp: configure-stamp
 	dh_testdir
 	# если не задан тип сборки запускаем cmake без указания типа, если задан - передаём его
 	# для сборки в Debug нужно запустить так: debuild -e CMAKE_BUILD_TYPE=Debug
-	cd build && pwd && if [ -z CMAKE_BUILD_TYPE ]; then cmake ..; else cmake -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) ..; fi
+	cd build && pwd && cmake ..
 	# TODO: возможно надо исправить
 	# последовательно запускаем make для каждой из целей.
 	# т.к. при параллельном запуске (make target1 target2) несколько раз одновременно создаются бинарники
@@ -57,8 +57,7 @@ install: build
 
 	# В случае сборки clickhouse-server, добавим в пакет бинарник clang-а, ld и заголовочные файлы - для динамической компиляции.
 	if [ -e debian/tmp/etc/init.d/clickhouse-server ]; then \
-		mkdir -p debian/tmp/usr/share/clickhouse/bin debian/tmp/usr/share/clickhouse/headers; \
-		debian/copy_clang_binaries.sh debian/tmp/usr/share/clickhouse/bin/; \
+		mkdir -p debian/tmp/usr/share/clickhouse/headers; \
 		./copy_headers.sh . debian/tmp/usr/share/clickhouse/headers; \
 	fi;
 
