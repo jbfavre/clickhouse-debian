@@ -8,7 +8,7 @@ ifndef THREADS_COUNT
     THREADS_COUNT=`grep -c ^processor /proc/cpuinfo`
 endif
 
-DAEMONS=compressor clickhouse-client clickhouse-server config-processor
+DAEMONS=clickhouse-client clickhouse-server compressor config-processor corrector_utf8
 
 BUILD_TARGETS=clickhouse $(DAEMONS)
 
@@ -76,7 +76,7 @@ binary-arch: build install
 	dh_installcron
 	dh_installdirs
 	dh_installchangelogs
-	dh_install --sourcedir=debian/tmp
+	dh_install --sourcedir=debian/tmp --list-missing
 	dh_strip
 	dh_link
 	dh_compress
