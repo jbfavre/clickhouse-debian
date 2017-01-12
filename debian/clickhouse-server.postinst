@@ -1,8 +1,19 @@
 #!/bin/sh
-
 set -e
+
+useradd -p "" metrika ||:
 
 mkdir -p /etc/clickhouse-server/conf.d
 chown -R metrika: /etc/clickhouse-server
+
+if id metrika > /dev/null 2>&1; then
+	mkdir -p /var/lib/clickhouse/data/default/
+	mkdir -p /var/lib/clickhouse/metadata/default/
+	mkdir -p /var/lib/clickhouse/cores/
+	chown -R metrika: /opt/clickhouse
+else
+	echo "User metrika doesn't exist."
+	exit 1
+fi
 
 #DEBHELPER#
