@@ -15,7 +15,7 @@ Homepage: https://clickhouse.yandex/
 Package: clickhouse-server-base
 Section: database
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, lsb-base (>= 3.2-14), adduser
 Description: clickhouse-server-base
  ClickHouse is an open-source column-oriented database management system
  that allows generating analytical data reports in real time.
