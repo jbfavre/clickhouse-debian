@@ -4,30 +4,25 @@
 # Uncomment this to turn on verbose mode.
 export DH_VERBOSE=1
 export USE_STATIC_LIBRARIES=0
+
+export DEB_BUILD_MAINT_OPTIONS=hardening=+all
+
 ifndef THREADS_COUNT
     THREADS_COUNT=`grep -c ^processor /proc/cpuinfo`
 endif
 
-DAEMONS=clickhouse-client clickhouse-server compressor config-processor corrector_utf8
+BUILD_TARGETS=clickhouse clickhouse-client clickhouse-server compressor config-processor corrector_utf8
 
-BUILD_TARGETS=clickhouse $(DAEMONS)
+%:
+	dh $@ --parallel --max-parallel=4 --buildsystem=cmake
 
-configure-stamp:
-	dh_testdir
-	rm -rf build
-	make clean 1> /dev/null 2>&1 || echo "Nothing to clean"
-	rm -f CMakeCache.txt
-	mkdir -p build
-	touch configure-stamp
+override_dh_auto_test:
 
-build: build-arch build-indep
-build-arch: build-stamp
-build-indep: build-stamp
-build-stamp: configure-stamp
+override_dh_auto_build:
 	dh_testdir
 	# если не задан тип сборки запускаем cmake без указания типа, если задан - передаём его
 	# для сборки в Debug нужно запустить так: debuild -e CMAKE_BUILD_TYPE=Debug
-	cd build && pwd && cmake ..
+	mkdir -p build && cd build && cmake ..
 	# TODO: возможно надо исправить
 	# последовательно запускаем make для каждой из целей.
 	# т.к. при параллельном запуске (make target1 target2) несколько раз одновременно создаются бинарники
@@ -38,14 +33,15 @@ build-stamp: configure-stamp
 	done
 	touch $@
 
-clean:
+override_dh_auto_clean:
 	dh_testdir
 	dh_testroot
-	rm -f configure-stamp build-stamp
 	rm -rf build
+	rm -rf obj-x86_64-linux-gnu
+	rm -f override_dh_auto_build
 	dh_clean
 
-install: build
+override_dh_auto_install:
 	dh_testdir
 	dh_testroot
 	dh_prep
@@ -54,36 +50,11 @@ install: build
 	do \
 		DESTDIR=../debian/tmp cmake -DCOMPONENT=$$target -P cmake_install.cmake; \
 	done
-
 	# В случае сборки clickhouse-server, добавим в пакет бинарник clang-а, ld и заголовочные файлы - для динамической компиляции.
-	if [ -e debian/tmp/etc/init.d/clickhouse-server ]; then \
-		mkdir -p debian/tmp/usr/share/clickhouse/headers; \
-		./copy_headers.sh . debian/tmp/usr/share/clickhouse/headers; \
-	fi;
+	mkdir -p debian/tmp/usr/share/clickhouse/bin debian/tmp/usr/share/clickhouse/headers;
+	#debian/copy_clang_binaries.sh debian/tmp/usr/share/clickhouse/bin/;
+	./copy_headers.sh . debian/tmp/usr/share/clickhouse/headers;
+	dh_install --sourcedir=debian/tmp
 
-# Build architecture-independent files here.
-binary-indep: build install
-# We have nothing to do by default.
-
-# Build architecture-dependent files here.
-binary-arch: build install
-	dh_testdir
-	dh_testroot
-	dh_installdocs
+override_dh_installinit:
 	dh_installinit --no-start --package=clickhouse-server --name=clickhouse-server
-	dh_installcron
-	dh_installdirs
-	dh_installchangelogs
-	dh_install --sourcedir=debian/tmp --list-missing
-	dh_strip
-	dh_link
-	dh_compress
-	dh_fixperms
-	dh_installdeb
-	dh_shlibdeps --exclude=clang --exclude=stdc --exclude=ld
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb -- -Zgzip -z3
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install
