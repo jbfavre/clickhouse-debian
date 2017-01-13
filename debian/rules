@@ -39,6 +39,7 @@ override_dh_auto_clean:
 	rm -rf build
 	rm -rf obj-x86_64-linux-gnu
 	rm -f override_dh_auto_build
+	rm -f debian/*-preprocessed.xml
 	dh_clean
 
 override_dh_auto_install:
