@@ -5,7 +5,7 @@
  	if args.zookeeper is None:
  		try:
 -			check_call(['grep', '-q', '<zookeeper', '/etc/clickhouse-server/config-preprocessed.xml'], )
-+			check_call(['grep', '-q', '<zookeeper', '../../debian/tmp/etc/clickhouse-server/config-preprocessed.xml'], )
++			check_call(['grep', '-q', '<zookeeper', '../../debian/clickhouse-server-config-tests-preprocessed.xml'], )
  			args.zookeeper = True
  		except CalledProcessError:
  			args.zookeeper = False
@@ -15,13 +15,13 @@
  set -o errexit
  set -o pipefail
  
-+CONFIG='../../debian/tmp/etc/clickhouse-server/config-preprocessed.xml'
++CONFIG='../../debian/clickhouse-server-config-tests-preprocessed.xml'
 +
  # Скрипт довольно хрупкий.
  
  # Попробуем угадать, где расположен конфиг сервера.
 -[ -f '/etc/clickhouse-server/config-preprocessed.xml' ] && CONFIG='/etc/clickhouse-server/config-preprocessed.xml' || CONFIG='../src/Server/config-preprocessed.xml'
-+[ -f '../../debian/tmp/etc/clickhouse-server/config-preprocessed.xml' ] && CONFIG='../../debian/tmp/etc/clickhouse-server/config-preprocessed.xml'
++[ -f '../../debian/clickhouse-server-config-tests-preprocessed.xml' ] && CONFIG='../../debian/clickhouse-server-config-tests-preprocessed.xml'
  
  if [ ! -f "$CONFIG" ]; then
  	echo "Cannot find config file for clickhouse-server" >&2

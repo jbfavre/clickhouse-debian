@@ -51,7 +51,7 @@
 
 
 	<!-- Path to data directory, with trailing slash. -->
-	<path>/tmp/clickhouse/idata/</path>
+	<path>/tmp/clickhouse/data/</path>
 
 	<!-- Path to temporary data for processing hard queries. -->
 	<tmp_path>/tmp/clickhouse/tmp/data/</tmp_path>
