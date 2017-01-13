@@ -25,3 +25,45 @@
  
  if [ ! -f "$CONFIG" ]; then
  	echo "Cannot find config file for clickhouse-server" >&2
+@@ -14,12 +16,12 @@ if [ ! -f "$CONFIG" ]; then
+ fi
+ 
+ # Создадим директории для данных второго сервера.
+-PATH2=/tmp/clickhouse/
++PATH2=/tmp/clickhouse2/
+ [ -d "$PATH2" ] && rm -rf $PATH2
+ mkdir -p ${PATH2}{data,metadata}/default/
+ 
+ # Создадим второй конфиг с портом 9001.
+-CONFIG2="config-9001.xml"
++CONFIG2="/tmp/config-9001.xml"
+ 
+ LOG=${PATH2}log
+ 
+@@ -28,9 +30,10 @@ cat "$CONFIG" | sed -r \
+ 	 s/<http_port>[0-9]+/<http_port>8124/;
+ 	 s/<tcp_port>[0-9]+/<tcp_port>9001/;
+ 	 s/<interserver_http_port>[0-9]+/<interserver_http_port>9010/;
+-	 s/users\.xml/users-preprocessed.xml/' > $CONFIG2
++	 s/<log>[^<]+/<log>'${LOG//\//\\/}'/;
++	 s/clickhouse-server-users-tests.xml/users-9001.xml/' > $CONFIG2
+ 
+-cp ${CONFIG/config/users} .
++cp ${CONFIG/config/users} ${CONFIG2/config/users} 1>&2
+ 
+ # Запустим второй сервер.
+ BINARY=$(readlink /proc/$(pidof clickhouse-server | tr ' ' '\n' | head -n1)/exe || echo "/usr/bin/clickhouse-server")
+@@ -58,11 +61,11 @@ trap finish EXIT
+ i=0
+ while true; do
+ 	grep -q 'Ready for connections' ${LOG} && break
+-	grep -q 'shutting down' ${LOG} && echo "Cannot start second clickhouse-server" && exit 1
++	grep -q 'shutting down' ${LOG} && echo "Cannot start second clickhouse-server" >&2 && exit 1
+ 	sleep 0.05
+ 
+ 	i=$(($i + 1))
+-	[[ $i == 100 ]] && echo "Cannot start second clickhouse-server" && exit 1
++	[[ $i == 100 ]] && echo "Cannot start second clickhouse-server" >&2  && exit 1
+ done
+ 
+ rm "$CONFIG2"
