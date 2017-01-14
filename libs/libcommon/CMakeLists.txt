@@ -27,6 +27,7 @@ endif()
 add_library (common
 	src/DateLUT.cpp
 	src/DateLUTImpl.cpp
+	src/exp10.cpp
 	src/ClickHouseRevision.cpp
 	src/JSON.cpp
 
@@ -37,6 +38,7 @@ add_library (common
 	include/common/LocalDate.h
 	include/common/LocalDateTime.h
 	include/common/ErrorHandlers.h
+	include/common/exp10.h
 	include/common/likely.h
 	include/common/logger_useful.h
 	include/common/MultiVersion.h
@@ -74,11 +76,13 @@ endif ()
 
 include (${ClickHouse_SOURCE_DIR}/cmake/find_glib.cmake)
 
+find_package (Threads)
+
 target_link_libraries (
 	common
 	pocoext
 	${MALLOC_LIBRARIES}
-	pthread
+	${CMAKE_THREAD_LIBS_INIT}
 	${GLIB_LIBS}
 	${ICU_LIBS}
 	${RT_LIBRARIES})
