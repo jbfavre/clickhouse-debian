@@ -51,5 +51,4 @@ Please fix this and reinstall this package." >&2
 
 fi
 
-
-exit 0
+#DEBHELPER#
