@@ -3,9 +3,9 @@
 set -e
 
 mkdir -p /etc/compressor/conf.d
-chown -R metrika: /etc/compressor
+chown -R clickhouse: /etc/compressor
 
 mkdir -p /etc/config-processor/conf.d
-chown -R metrika: /etc/config-processor
+chown -R clickhouse: /etc/config-processor
 
 #DEBHELPER#

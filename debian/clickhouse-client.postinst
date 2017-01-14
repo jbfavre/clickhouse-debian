@@ -3,6 +3,6 @@
 set -e
 
 mkdir -p /etc/clickhouse-client/conf.d
-chown -R metrika: /etc/clickhouse-client
+chown -R clickhouse: /etc/clickhouse-client
 
 #DEBHELPER#

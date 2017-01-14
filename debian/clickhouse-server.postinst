@@ -1,19 +1,55 @@
 #!/bin/sh
 set -e
 
-useradd -p "" metrika ||:
+if [ "$1" = configure ]; then
 
-mkdir -p /etc/clickhouse-server/conf.d
-chown -R metrika: /etc/clickhouse-server
+       if [ -x "/etc/init.d/clickhouse-server" ]; then
+               update-rc.d clickhouse-server defaults 19 19 >/dev/null || exit $?
+       fi
 
-if id metrika > /dev/null 2>&1; then
-	mkdir -p /var/lib/clickhouse/data/default/
-	mkdir -p /var/lib/clickhouse/metadata/default/
-	mkdir -p /var/lib/clickhouse/cores/
-	chown -R metrika: /opt/clickhouse
-else
-	echo "User metrika doesn't exist."
-	exit 1
+       # Make sure the administrative user exists
+       if ! getent passwd clickhouse > /dev/null; then
+               adduser --system --disabled-login --no-create-home --home /nonexistent \
+                       --shell /bin/false --group --gecos "Clickhouse server" clickhouse > /dev/null
+       fi
+
+       # if the user was created manually, make sure the group is there as well
+       if ! getent group clickhouse > /dev/null; then
+               addgroup --system clickhouse > /dev/null
+       fi
+
+       # make sure user is in the correct group
+       if ! id -Gn clickhouse | grep -qw clickhouse; then
+               adduser clickhouse clickhouse > /dev/null
+       fi
+
+       # check validity of user and group
+       if [ "`id -u clickhouse`" -eq 0 ]; then
+               echo "The clickhouse system user must not have uid 0 (root).
+Please fix this and reinstall this package." >&2
+               exit 1
+       fi
+
+       if [ "`id -g clickhouse`" -eq 0 ]; then
+               echo "The clickhouse system user must not have root as primary group.
+Please fix this and reinstall this package." >&2
+               exit 1
+       fi
+
+       if [ ! -d "/var/lib/clickhouse" ]; then
+               # ensure home directory ownership
+               mkdir -p /var/lib/clickhouse
+               #su -s /bin/sh clickhouse -c "test -O /var/lib/clickhouse && test -G /var/lib/clickhouse" || \
+               chown clickhouse:clickhouse /var/lib/clickhouse
+               chmod 0700 /var/lib/clickhouse
+       fi
+
+       # Clean old dynamic compilation results
+       if [ -d "/var/lib/clickhouse/build" ]; then
+               rm -f /var/lib/clickhouse/build/*.cpp /var/lib/clickhouse/build/*.so ||:
+       fi
+
 fi
 
-#DEBHELPER#
+
+exit 0
