@@ -9,7 +9,6 @@ CONFFILES="/etc/clickhouse-server/config.xml
 
 if [ "${1}" = "purge" ]
 then
-     	update-rc.d clickhouse-server remove
 	for CONFFILE in ${CONFFILES}
 	do
 		dpkg-statoverride --remove ${CONFFILE} || test $? -eq 2

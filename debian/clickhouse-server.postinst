@@ -3,10 +3,6 @@ set -e
 
 if [ "$1" = configure ]; then
 
-       if [ -x "/etc/init.d/clickhouse-server" ]; then
-               update-rc.d clickhouse-server defaults 19 19 >/dev/null || exit $?
-       fi
-
        # Make sure the administrative user exists
        if ! getent passwd clickhouse > /dev/null; then
                adduser --system --disabled-login --no-create-home --home /nonexistent \
