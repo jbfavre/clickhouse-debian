@@ -56,6 +56,4 @@ override_dh_auto_install:
 	debian/copy_clang_binaries.sh debian/tmp/usr/share/clickhouse/bin/;
 	./copy_headers.sh . debian/tmp/usr/share/clickhouse/headers;
 	dh_install --sourcedir=debian/tmp
-
-override_dh_installinit:
-	dh_installinit --no-start --package=clickhouse-server --name=clickhouse-server
+	rm -f debian/tmp/etc/init.d/clickhouse-server
