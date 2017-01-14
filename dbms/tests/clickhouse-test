@@ -57,7 +57,7 @@ def main(args):
 
 	if args.zookeeper is None:
 		try:
-			check_call(['grep', '-q', '<zookeeper', '/etc/clickhouse-server/config-preprocessed.xml'], )
+			check_call(['grep', '-q', '<zookeeper', '../../debian/clickhouse-server-config-tests-preprocessed.xml'], )
 			args.zookeeper = True
 		except CalledProcessError:
 			args.zookeeper = False
