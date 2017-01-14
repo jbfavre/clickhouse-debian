@@ -20,8 +20,8 @@ override_dh_auto_test:
 
 override_dh_auto_build:
 	dh_testdir
-	# если не задан тип сборки запускаем cmake без указания типа, если задан - передаём его
-	# для сборки в Debug нужно запустить так: debuild -e CMAKE_BUILD_TYPE=Debug
+	# for building Debug run: debuild -e CMAKE_BUILD_TYPE=Debug
+	# for building with shared libs run: debuild -e USE_STATIC_LIBRARIES=0
 	mkdir -p build && cd build && cmake ..
 	# TODO: возможно надо исправить
 	# последовательно запускаем make для каждой из целей.
