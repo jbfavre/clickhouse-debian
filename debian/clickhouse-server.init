@@ -9,8 +9,8 @@
 # Description:		clickhouse-server - Analytics db
 ### END INIT INFO
 
-USER=metrika
-GROUP=metrika
+USER=clickhouse
+GROUP=clickhouse
 SHELL=/bin/bash
 PROGRAM=clickhouse-server
 SYSCONFDIR=/etc/$PROGRAM
