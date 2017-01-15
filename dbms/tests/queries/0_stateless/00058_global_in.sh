@@ -3,12 +3,10 @@
 set -o errexit
 set -o pipefail
 
-CONFIG='../../debian/clickhouse-server-config-tests-preprocessed.xml'
-
 # Скрипт довольно хрупкий.
 
 # Попробуем угадать, где расположен конфиг сервера.
-[ -f '../../debian/clickhouse-server-config-tests-preprocessed.xml' ] && CONFIG='../../debian/clickhouse-server-config-tests-preprocessed.xml'
+[ -f '/etc/clickhouse-server/config-preprocessed.xml' ] && CONFIG='/etc/clickhouse-server/config-preprocessed.xml' || CONFIG='../src/Server/config-preprocessed.xml'
 
 if [ ! -f "$CONFIG" ]; then
 	echo "Cannot find config file for clickhouse-server" >&2
@@ -16,12 +14,12 @@ if [ ! -f "$CONFIG" ]; then
 fi
 
 # Создадим директории для данных второго сервера.
-PATH2=/tmp/clickhouse2/
+PATH2=/tmp/clickhouse/
 [ -d "$PATH2" ] && rm -rf $PATH2
 mkdir -p ${PATH2}{data,metadata}/default/
 
 # Создадим второй конфиг с портом 9001.
-CONFIG2="/tmp/config-9001.xml"
+CONFIG2="config-9001.xml"
 
 LOG=${PATH2}log
 
@@ -30,10 +28,9 @@ cat "$CONFIG" | sed -r \
 	 s/<http_port>[0-9]+/<http_port>8124/;
 	 s/<tcp_port>[0-9]+/<tcp_port>9001/;
 	 s/<interserver_http_port>[0-9]+/<interserver_http_port>9010/;
-	 s/<log>[^<]+/<log>'${LOG//\//\\/}'/;
-	 s/clickhouse-server-users-tests.xml/users-9001.xml/' > $CONFIG2
+	 s/users\.xml/users-preprocessed.xml/' > $CONFIG2
 
-cp ${CONFIG/config/users} ${CONFIG2/config/users} 1>&2
+cp ${CONFIG/config/users} .
 
 # Запустим второй сервер.
 BINARY=$(readlink /proc/$(pidof clickhouse-server | tr ' ' '\n' | head -n1)/exe || echo "/usr/bin/clickhouse-server")
@@ -61,11 +58,11 @@ trap finish EXIT
 i=0
 while true; do
 	grep -q 'Ready for connections' ${LOG} && break
-	grep -q 'shutting down' ${LOG} && echo "Cannot start second clickhouse-server" >&2 && exit 1
+	grep -q 'shutting down' ${LOG} && echo "Cannot start second clickhouse-server" && exit 1
 	sleep 0.05
 
 	i=$(($i + 1))
-	[[ $i == 100 ]] && echo "Cannot start second clickhouse-server" >&2  && exit 1
+	[[ $i == 100 ]] && echo "Cannot start second clickhouse-server" && exit 1
 done
 
 rm "$CONFIG2"
