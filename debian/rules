@@ -39,7 +39,10 @@ override_dh_auto_clean:
 	rm -rf build
 	rm -rf obj-x86_64-linux-gnu
 	rm -f override_dh_auto_build
+	# Delete stdout & stderr files from tests
+	rm -f dbms/tests/queries/0_stateless/*.std*
 	rm -f debian/*-preprocessed.xml
+	# Proceed legacy clean
 	dh_clean
 
 override_dh_auto_install:
